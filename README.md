@@ -103,26 +103,36 @@ for dirname, commit_date in subdirs_with_dates:
     elif readme_path.exists():
         # Generate new summary using llm command
         prompt = """Summarize this research project concisely. Write just 1 paragraph (3-5 sentences) followed by an optional short bullet list if there are key findings. Vary your opening - don't start with "This report" or "This research". Include 1-2 links to key tools/projects. Be specific but brief. No emoji."""
-        result = subprocess.run(
-            ['llm', '-m', MODEL, '-s', prompt],
-            stdin=open(readme_path),
-            capture_output=True,
-            text=True,
-            timeout=60
-        )
-        if result.returncode != 0:
-            error_msg = f"LLM command failed for {dirname} with return code {result.returncode}"
-            if result.stderr:
-                error_msg += f"\nStderr: {result.stderr}"
-            raise RuntimeError(error_msg)
-        if result.stdout.strip():
+        try:
+            result = subprocess.run(
+                ['llm', '-m', MODEL, '-s', prompt],
+                stdin=open(readme_path),
+                capture_output=True,
+                text=True,
+                timeout=60
+            )
+        except (FileNotFoundError, subprocess.TimeoutExpired) as e:
+            import sys
+            print(f"*No description available — llm invocation failed ({e}).*")
+            sys.stderr.write(f"warning: llm unavailable for {dirname}: {e}\n")
+            print()
+            continue
+
+        if result.returncode != 0 or not result.stdout.strip():
+            import sys
+            stderr_excerpt = (result.stderr or '').strip().splitlines()[-1] if result.stderr else ''
+            sys.stderr.write(
+                f"warning: llm summary generation failed for {dirname} "
+                f"(rc={result.returncode}): {stderr_excerpt}\n"
+            )
+            # Fall back to a placeholder; do NOT cache so a fix retries next run.
+            print("*No description available — auto-summary unavailable.*")
+        else:
             description = result.stdout.strip()
             print(description)
             # Save to cache file
             with open(summary_path, 'w') as f:
                 f.write(description + '\n')
-        else:
-            raise RuntimeError(f"LLM command returned no output for {dirname}")
     else:
         print("*No description available.*")
 
