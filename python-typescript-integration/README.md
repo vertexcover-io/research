@@ -1,5 +1,28 @@
 # Integrating a Python library into a TypeScript project
 
+> [!NOTE]
+> This is an AI-generated research report. All text and code in this report
+> was created by an LLM (Large Language Model) — specifically Claude
+> (Opus 4.7) running inside Claude Code. No part of this document was
+> written by a human.
+
+## Prompts that produced this report
+
+The report was generated from this conversation with Claude Code:
+
+> Consider you have a python library for example scenedetect and I want to
+> use it in a typescript project — help me identify the most optimized way
+> to achieve that, along with all the options that exist.
+
+Followed by a refinement:
+
+> Can you add more details about each of these methods and talk about
+> limitations a bit more.
+
+The model was then asked to commit the result as a research doc.
+
+---
+
 Research notes on the available approaches, their tradeoffs, and detailed
 limitations. Written with `scenedetect` as a running example because it's a
 good stress test: it's CPU-heavy, depends on OpenCV, and processes large
