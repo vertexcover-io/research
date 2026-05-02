@@ -82,6 +82,21 @@ C5. **Biologically-inspired episodic / hippocampal memory**
 
 (Bonus C6 - parametric/in-weights: Cartridges, sparse memory finetuning, LoRA continual learning. Less mature for production agents but conceptually distinct.)
 
+### Follow-up: Honcho added as Concept 6 in README
+
+User pointed out Honcho was missing. Researched and decided it deserves its own conceptual bucket rather than being lumped with Mem0/MemoryBank in C2:
+
+- **Honcho** (Plastic Labs, github.com/plastic-labs/honcho) - "Personal Identity Platform for AI"
+- Defining choice: the unit of memory is a **peer model** (Theory-of-Mind), not a fact
+- Both users and agents are "peers" - symmetric multi-party model
+- 4 cooperating background agents: Deriver (extracts ToM observations), Dialectic (5-level reasoning at retrieval time), Summary (compresses sessions), Dream (every ~8h consolidates: merges redundant, deletes outdated, infers higher patterns)
+- Two-layer context injection: base (peer card + identity) + dialectic supplement (just-in-time reasoning)
+- Why distinct from C2: C2 stores propositions; Honcho stores *psychological models of minds*
+- Why distinct from C4: C4 evolves notes through linking; Honcho evolves *user representations* with the agent itself as a peer
+- Mostly the renumbering: keep 5 original buckets, add Honcho as C6.
+
+(Renumbered the bumped C6 parametric note - parametric memory remains called out in Part 4 "Open Questions" as a future 6th category at the time of original drafting; with Honcho added it would be the *7th* emerging concept.)
+
 ### Picking the top 5 by concept
 
 The 5 conceptual buckets I'll cover (chosen because each represents a fundamentally different answer to "where do memories live and how do you find them?"):

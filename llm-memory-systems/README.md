@@ -1,6 +1,6 @@
 # LLM / Agentic Memory Systems — A Conceptual Survey
 
-A deep-dive into how the LLM-agent community currently *measures* long-term memory and the **five fundamentally different conceptual approaches** that show up at the top of those leaderboards.
+A deep-dive into how the LLM-agent community currently *measures* long-term memory and the **six fundamentally different conceptual approaches** that show up at the top of those leaderboards.
 
 Date of survey: May 2026.
 
@@ -101,11 +101,11 @@ The earlier benchmark used in the original MemGPT paper and reused by Zep. Mostl
 
 ---
 
-## Part 2 — The Top 5 *Conceptual* Approaches
+## Part 2 — The Top *Conceptual* Approaches
 
-Below, "top 5" means the five conceptually distinct architectures that dominate the leaderboards. Within each bucket, multiple products exist (e.g., Mem0 and OpenAI Memory both fall in C2); they differ in execution, not in idea.
+Below, "top" means conceptually distinct architectures that dominate the leaderboards or research literature. Within each bucket, multiple products exist (e.g., Mem0 and OpenAI Memory both fall in C2); they differ in execution, not in idea.
 
-The five buckets answer the same question — *where do memories live and how do you retrieve them?* — in fundamentally different ways.
+The buckets answer the same question — *where do memories live and how do you retrieve them?* — in fundamentally different ways. The original survey isolated five; Honcho's Theory-of-Mind framing is distinct enough to warrant a sixth.
 
 ### Concept 1 — OS-Paged Hierarchical Memory
 
@@ -243,21 +243,53 @@ The five buckets answer the same question — *where do memories live and how do
 
 **Why it's its own concept.** The defining choice is *neuroscience-informed retrieval*. C2 retrieves the nearest point; C3 traverses an explicit graph; C5 simulates a brain region — Personalized PageRank as a stand-in for hippocampal pattern completion (HippoRAG), or surprise-driven segmentation as a stand-in for episodic event cognition (EM-LLM).
 
+### Concept 6 — Theory-of-Mind / Peer-Model Memory
+
+**Representative system:** Honcho (Plastic Labs).
+**Reference:** [plastic-labs/honcho](https://github.com/plastic-labs/honcho); [*Launching Honcho: The Personal Identity Platform for AI*](https://blog.plasticlabs.ai/blog/Launching-Honcho;-The-Personal-Identity-Platform-for-AI).
+
+**Core idea.** The unit of memory is not a fact, not an entity, not an event — it's a **psychological model of a peer**. Both users and agents are "peers"; the system continuously infers each peer's preferences, beliefs, personality, history, and current intent, and serves those models as context. Honcho explicitly does *not* store conversations; it derives conclusions from them.
+
+**Architecture.** Four background LLM agents cooperate:
+
+1. **Deriver.** Reads every message and emits *observations* — Theory-of-Mind conclusions about the speaker (e.g. "user has 10+ years of Rust experience", "user prefers async communication"). These observations are the atomic unit, replacing the "fact row" of C2.
+2. **Dialectic.** Answers questions about a peer on demand using a 5-level reasoning hierarchy. This is the retrieval primitive — instead of `top-k similar`, you ask "what does this user think about X?" and the Dialectic agent reasons over stored observations to synthesize an answer.
+3. **Summary.** Compresses long sessions into short/long summaries so context stays bounded.
+4. **Dream.** Runs every ~8 hours: merges redundant observations, deletes outdated ones, infers higher-level patterns. This is the consolidation pass — closer in spirit to Generative-Agents reflections (C2) or A-MEM evolution (C4) than to anything in C3.
+
+**Two-layer context injection.** When the agent talks, Honcho injects:
+* **Base context** — session summary, user representation, peer card, agent self-representation, agent identity card. The "who is this user" layer.
+* **Dialectic supplement** — just-in-time LLM-synthesized reasoning about the user's *current* state and needs. The "what matters right now" layer.
+
+**Strengths.**
+* Explicitly handles identity, preferences, and personality — the things flat fact stores fragment.
+* Multi-party / multi-agent native (peers are symmetric).
+* Asynchronous Dream pass means consolidation cost is amortized off the request path.
+
+**Weaknesses.**
+* Theory-of-Mind inferences can hallucinate. There's no ground truth for "user is anxious about deadlines."
+* Less benchmark coverage than C1–C3. Not on the LongMemEval public leaderboard at time of writing.
+* The peer abstraction is opinionated — fine for chat assistants, awkward for, say, codebase or document memory.
+
+**Why it's its own concept.** The defining choice is *the unit of memory is a peer model, not a fact*. C2 stores propositions; C3 stores typed relations; C4 stores notes that link; C5 stores graphs/episodes. Honcho stores **representations of minds**, with the agent's own self-representation as a first-class peer alongside the user. It's the only system in this list whose primary abstraction is psychological rather than informational.
+
+It overlaps the others in execution — observations look like Mem0 facts, the Dream pass resembles Generative-Agent reflections — but the framing changes what gets stored, what gets retrieved, and how retrieval is phrased.
+
 ---
 
-## Part 3 — How the Five Concepts Compare
+## Part 3 — How the Six Concepts Compare
 
-| Axis | C1 OS-paged | C2 Extracted vectors | C3 Temporal KG | C4 Self-organizing | C5 Bio-inspired |
-|---|---|---|---|---|---|
-| Storage substrate | Vector DB + scratchpad | Vector DB | Graph DB (typed) | Vector DB + emergent links | Graph (HippoRAG) / KV cache (EM-LLM) |
-| Memory granularity | Free-form notes | Atomic facts | Entities + relations | Linked notes | Subgraphs / event chunks |
-| Update policy | Agent-driven | Overwrite + dedupe | Bi-temporal invalidation | Link rewiring + context update | Append (HippoRAG) / online (EM-LLM) |
-| Retrieval primitive | LLM tool call | Cosine similarity | Hybrid: BM25 + cosine + traversal | Similarity + link expansion | Personalized PageRank / surprise + contiguity |
-| Time model | None native | Timestamps as metadata | Bi-temporal first-class | Implicit via reinterpretation | Temporal contiguity (EM-LLM) |
-| Forgetting | None (manual) | Forgetting curve / overwrite | Invalidation, never delete | Link decay / rewrite | None / sliding |
-| Best at | Open-ended agents, tool ecosystems | Single-hop fact recall, low latency | Multi-hop, time-travel queries, knowledge updates | Reinterpretive contexts, evolving understanding | Multi-hop retrieval (HippoRAG); long-context QA (EM-LLM) |
-| Weakest at | Cost, reliability of self-management | Multi-hop, temporal | Schema brittleness, extraction cost | Write-time cost, less production-tested | Single benchmark; pipeline-specific |
-| Status | Production (Letta) | Production (Mem0, OpenAI) | Production (Zep, Cognee) | Research (NeurIPS 2025) | Research (NeurIPS 2024 / ICLR 2025) |
+| Axis | C1 OS-paged | C2 Extracted vectors | C3 Temporal KG | C4 Self-organizing | C5 Bio-inspired | C6 Peer model |
+|---|---|---|---|---|---|---|
+| Storage substrate | Vector DB + scratchpad | Vector DB | Graph DB (typed) | Vector DB + emergent links | Graph (HippoRAG) / KV cache (EM-LLM) | Per-peer observation + summary store |
+| Memory granularity | Free-form notes | Atomic facts | Entities + relations | Linked notes | Subgraphs / event chunks | Theory-of-Mind observations + peer cards |
+| Update policy | Agent-driven | Overwrite + dedupe | Bi-temporal invalidation | Link rewiring + context update | Append (HippoRAG) / online (EM-LLM) | Async "Dream" consolidation every ~8h |
+| Retrieval primitive | LLM tool call | Cosine similarity | Hybrid: BM25 + cosine + traversal | Similarity + link expansion | Personalized PageRank / surprise + contiguity | Dialectic LLM reasoning over peer observations |
+| Time model | None native | Timestamps as metadata | Bi-temporal first-class | Implicit via reinterpretation | Temporal contiguity (EM-LLM) | Implicit (newer observations subsume older) |
+| Forgetting | None (manual) | Forgetting curve / overwrite | Invalidation, never delete | Link decay / rewrite | None / sliding | Dream pass merges/deletes outdated |
+| Best at | Open-ended agents, tool ecosystems | Single-hop fact recall, low latency | Multi-hop, time-travel queries, knowledge updates | Reinterpretive contexts, evolving understanding | Multi-hop retrieval (HippoRAG); long-context QA (EM-LLM) | Personalization, identity, multi-party agents |
+| Weakest at | Cost, reliability of self-management | Multi-hop, temporal | Schema brittleness, extraction cost | Write-time cost, less production-tested | Single benchmark; pipeline-specific | Hallucinated psychology; non-user data |
+| Status | Production (Letta) | Production (Mem0, OpenAI) | Production (Zep, Cognee) | Research (NeurIPS 2025) | Research (NeurIPS 2024 / ICLR 2025) | Production (Honcho / Plastic Labs) |
 
 ## Part 4 — Open Questions and Where the Field Is Heading
 
@@ -265,7 +297,7 @@ The five buckets answer the same question — *where do memories live and how do
 2. **Extraction is the bottleneck.** Every system except C1-MemGPT and C5b-EM-LLM depends on an LLM extraction pass at write time. Quality of memory is upper-bounded by quality of extraction.
 3. **No shared harness.** ByteRover, Hindsight, Supermemory, Mem0, Zep all publish self-reported numbers. Independent harnesses (Maximem Synap, AMB) are emerging but the field still lacks a Kaggle-style canonical leaderboard.
 4. **Hybrids are winning in practice.** Cognee, Mem0-Graph, Zep all combine ≥2 of the above concepts. The pure-form systems are conceptual reference points; production systems blend.
-5. **A 6th concept on the horizon: parametric memory.** Cartridges (Stanford Hazy Research, 2025), sparse memory finetuning, and KV-cache-as-memory approaches treat memory as model weights or compressed caches. Not yet on the agent-memory leaderboards but a credible threat to all five categories above — especially C2 and C5b.
+5. **A 7th concept on the horizon: parametric memory.** Cartridges (Stanford Hazy Research, 2025), sparse memory finetuning, and KV-cache-as-memory approaches treat memory as model weights or compressed caches. Not yet on the agent-memory leaderboards but a credible threat to all six categories above — especially C2 and C5b.
 
 ---
 
@@ -297,6 +329,10 @@ The five buckets answer the same question — *where do memories live and how do
 - [HippoRAG (NeurIPS 2024, arXiv 2405.14831)](https://arxiv.org/abs/2405.14831)
 - [EM-LLM (arXiv 2407.09450)](https://arxiv.org/abs/2407.09450)
 - [EM-LLM — project page](https://em-llm.github.io/)
+- [Honcho — GitHub (Plastic Labs)](https://github.com/plastic-labs/honcho)
+- [Honcho — docs](https://docs.honcho.to/)
+- [Launching Honcho — Plastic Labs blog](https://blog.plasticlabs.ai/blog/Launching-Honcho;-The-Personal-Identity-Platform-for-AI)
+- [Benchmarking Honcho — Plastic Labs](https://blog.plasticlabs.ai/research/Benchmarking-Honcho)
 
 ### Comparative writeups
 - [Zep's "State of the Art" comparison](https://blog.getzep.com/state-of-the-art-agent-memory/)
