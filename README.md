@@ -187,7 +187,11 @@ for dirname, _ in subdirs_with_dates:
             readme_path.write_text('\n'.join(new_lines))
 
 ]]]-->
-## 1 research projects
+## 2 research projects
+
+### [LLM / Agentic Memory Systems — A Conceptual Survey](https://github.com/vertexcover-io/research/tree/master/llm-memory-systems#readme) (2026-05-02 11:45)
+
+*No description available — auto-summary unavailable.*
 
 ### [Integrating a Python library into a TypeScript project](https://github.com/vertexcover-io/research/tree/master/python-typescript-integration#readme) (2026-05-01 09:02)
 

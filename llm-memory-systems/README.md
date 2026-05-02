@@ -1,5 +1,10 @@
 # LLM / Agentic Memory Systems — A Conceptual Survey
 
+<!-- AI-GENERATED-NOTE -->
+> [!NOTE]
+> This is an AI-generated research report. All text and code in this report was created by an LLM (Large Language Model).
+<!-- /AI-GENERATED-NOTE -->
+
 A deep-dive into how the LLM-agent community currently *measures* long-term memory and the **six fundamentally different conceptual approaches** that show up at the top of those leaderboards.
 
 Date of survey: May 2026.
