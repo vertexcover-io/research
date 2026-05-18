@@ -335,3 +335,29 @@ Recommended talks (his "3 must-watch talks"):
    the surviving complexity.
 8. *Long-term*: Strangler Fig pieces out toward a new architecture.
 
+
+---
+
+## Follow-up: How the agentic AI world is applying these techniques
+
+Question: what are people building so that *coding agents* themselves produce
+higher-quality software? What's inside OpenAI's "software factory", Claude
+Code, Devin, etc.?
+
+Findings organised below as a companion file (`agentic-applications.md`).
+Major themes:
+
+1. Agent harnesses are converging — Claude Code, Codex, Aider, Cline.
+2. "Harness engineering" / "context engineering" is the named discipline.
+3. Eval is the new TDD: SWE-bench Verified, SWE-Lancer, SWE-rebench.
+4. Verifier loops (RLEF, AlphaCodium, ReVeal, AlphaEvolve) =
+   characterization tests for LLM outputs.
+5. Repo maps (Aider's tree-sitter + PageRank) = automated hotspot/
+   knowledge-map equivalent for agents.
+6. Sandboxes (E2B, Daytona, Modal, Inspect Sandboxing) = the "test
+   harness" Feathers wrote about, but for the agent to safely run code.
+7. TestGen-LLM (Meta), Cover-Agent (Qodo), Mutahunter — automated
+   characterization test generation, mutation-guided.
+8. CLAUDE.md / AGENTS.md / SKILL.md = ADRs for agent collaborators.
+9. LLM-as-judge has reliability issues — execution feedback beats
+   judgment for code.

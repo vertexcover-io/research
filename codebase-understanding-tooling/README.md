@@ -7,6 +7,11 @@ to do three closely related things:
 2. **Review** code with more rigor than line-by-line diff inspection.
 3. **Introduce tests** into code that has none, so it can be safely changed.
 
+> **See also: [`agentic-applications.md`](./agentic-applications.md)** —
+> how the AI-coding-agent world (OpenAI Codex, Claude Code, Devin, Aider,
+> Meta TestGen-LLM, SWE-bench, RLEF, AlphaCodium…) is reinventing these
+> same techniques to make agent-written software actually work.
+
 The work is organised into "families" — clusters of tools/ideas that share
 a common philosophy. Each family lists primary sources so you can dive
 deeper.
