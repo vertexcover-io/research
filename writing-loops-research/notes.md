@@ -63,3 +63,36 @@ podcast; dev-conf attribution corroborated by 2+ sources.
 
 Dead ends: swyx/Latent Space (no "writing loops" usage), Hamel Husain (no hits),
 no Simon Willison comment on the June 2026 coinage yet.
+
+### Agent 5 — Adjacent concepts & vocabulary timeline (done)
+
+- ReAct (Yao et al., Oct 2022, arxiv 2210.03629): loop lived *in the prompt*
+  (Thought/Action/Observation). Modern while-loop practice drops the scaffolding
+  because native tool-calling absorbed it; loop moved into ~10 lines of host code.
+- Philipp Schmid "Inner Loop vs Outer Loop" (Feb 2026, philschmid.de): inner loop =
+  ReAct-style within-task reliability; outer loop = across sessions, getting smarter
+  over time (memory, skills, rules files). Cleanest published vocabulary split.
+- Hamel Husain's loop = the eval/error-analysis feedback loop (improvement over time),
+  distinct from the runtime agent loop.
+- Vocabulary ownership timeline:
+  - "tools in a loop" = Simon Willison ("An LLM agent runs tools in a loop to achieve
+    a goal", settled Sep 2025 after crowdsourcing 211 definitions) + Anthropic
+  - "agent = llm + memory + planning + tools + while loop" = swyx (Mar 2025)
+  - "An agent is a LLM wrecking its environment in a loop" = Solomon Hykes (Jun 2025)
+  - "own your control flow" (Factor 8) = Dex Horthy, 12-factor agents (Apr 2025)
+  - "context engineering" = Anthropic (Sep 29, 2025) / LangChain
+  - "harness engineering" = Mitchell Hashimoto (Feb 2026, "Agent = Model + Harness");
+    legitimized by Latent Space AINews + AIE Europe 2026 Harness Engineering track;
+    martinfowler.com article; HumanLayer "Skill Issue" post
+  - "loop engineering" / "writing loops" = Cherny → Steinberger → Osmani (June 2026)
+  - "compound engineering" = Every.to (Dan Shipper/Kieran Klaassen): plan → work →
+    review → compound (lessons fed back so the next loop is better)
+  - "Ralph loop" = Geoffrey Huntley (`while :; do cat PROMPT.md | claude-code; done`),
+    Jul 2025; "everything is a ralph loop" ghuntley.com/loop/ Jan 2026
+- Framework skepticism genre: Octomind "why we no longer use LangChain" (2024),
+  Braintrust "canonical agent architecture: a while loop" (Aug 2025), dev.to "Agents
+  are Loops". Counter-skepticism: AlphaSignal "Most Developers Do Not Need Agent
+  Loops Yet" (cost critique, premature-completion failures).
+- Caveat: Hashimoto coinage attribution is via secondary sources.
+- Note: this agent said Cherny clip was "Acquired podcast" per one source — agent 1
+  flagged that as likely conflation; dev-conf attribution better corroborated.
