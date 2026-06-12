@@ -365,3 +365,58 @@ His actual loops:
 - Synthesis: every loop = trigger + standing prompt file (intent) + model as
   per-tick decision-maker + verifier that can say no + explicit stop/silence
   condition, with deterministic narrowly-privileged executors for side effects.
+
+### Agent B — Cherny's actual loops (done)
+
+Quote provenance corrected: **Acquired Unplugged, presented by WorkOS, SF, June 2,
+2026** (so the earlier "Acquired podcast" mention was right after all; "Anthropic
+dev conf" attribution was the conflation). Video: youtube RkQQ7WEor7w. Longer
+quote: "...I don't prompt Claude anymore. I have loops that are running... My job
+is to write loops. And this is the transition we're going to see for the rest of
+the year." Fortune Brainstorm Tech Jun 8: "This morning I was managing maybe a few
+hundred [agents]... Some days it's... thousands, or tens of thousands"; 8x increase
+in code written at Anthropic; no handwritten code in ~8 months.
+
+**His actual named loops** (his own X thread, Mar 30 2026, "15 underrated Claude
+Code features", item 3, status 2038454341884154269; archived in GitHub mirrors):
+  /loop 5m  /babysit            # auto-address code review, auto-rebase, shepherd PRs to production
+  /loop 30m /slack-feedback     # automatically put up PRs for Slack feedback every 30 mins
+  /loop     /post-merge-sweeper # put up PRs to address code review comments I missed
+  /loop 1h  /pr-pruner          # close out stale and no longer necessary PRs
+  # "...and lots more!"
+Pattern: "Experiment with turning workflows into skills + loops." Skill bodies
+never published — community versions are reconstructions.
+
+/loop launch announcement (~Mar 7, 2026, status 2030193932404150413): "/loop is a
+powerful new way to schedule recurring tasks, for up to 3 days at a time."
+
+What /loop IS (official docs, code.claude.com/docs/en/scheduled-tasks, verbatim):
+bundled skill (v2.1.72+) on a real in-session cron scheduler — CronCreate/CronList/
+CronDelete tools, max 50 tasks/session, fires when idle, jitter ≤30min, 7-day
+expiry. No interval → self-paced (1min-1h based on observations). No prompt →
+built-in maintenance prompt (tend PR: review comments, failed CI, conflicts),
+replaceable via .claude/loop.md. Three tiers: /loop (in-session) → Desktop
+scheduled tasks (fresh session per run, ~/.claude/scheduled-tasks/<name>/SKILL.md,
+self-reschedule via MCP tool) → Routines (cloud; cron ≥1h / API webhook / GitHub
+events). Related: /goal (v2.1.139, completion condition), dynamic workflows
+(v2.1.154, orchestrates tens-hundreds of agents = the "couple hundred agents"
+machinery), Channels (CI events push into session).
+
+Other Cherny setup: 259 PRs/497 commits/40k lines in 30 days all Claude-written
+(Dec 2025, via simonwillison.net/2025/Dec/27/boris-cherny/); voice coding, git
+worktrees (claude -w), /batch fan-out, /teleport, mobile sessions. Secondhand:
+"few thousand sub-agents nightly", "150 PRs in one day from phone", CI-flaky-test
+patcher loop, Twitter-feedback clustering loop every 30 min (hanakoxbt retelling).
+
+Community reconstructions:
+- cobusgreyling/loop-engineering: 7 patterns (Daily Triage, PR Babysitter 5-15m,
+  CI Sweeper, Dependency Sweeper, Changelog Drafter, Post-Merge Cleanup, Issue
+  Triage) + loop-init/loop-audit/loop-cost.
+- cassioerodrigues/auto-skedway: ~250-line working nightly loop — cron → gh issue
+  list (3 oldest) → branch → timeout 30m claude -p → JSON sentinel → verify commit
+  → gh pr create → comment; no auto-merge.
+- bearded-giant/claude-code-config has a real /post-merge-sweeper skill.
+- 0xquinto/bcherny-claude mirrors his published commands/agents/settings.
+- paddo.dev "From Ralph Wiggum to /loop": /loop = productized Ralph successor.
+
+→ Updated README section 3 (venue correction) + new section on standing loops.

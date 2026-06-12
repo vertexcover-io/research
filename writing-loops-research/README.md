@@ -8,7 +8,7 @@
 
 **"Writing loops" is the practice of replacing yourself as the person who prompts a coding agent: instead of typing prompts interactively, you write an outer loop — a script, scheduler, or hook — that prompts the agent repeatedly, feeds back verification results, and runs until a measurable goal is met.**
 
-The phrase as a named practice comes from **Boris Cherny (creator of Claude Code)**, on stage at Anthropic's developer conference in San Francisco (~June 5–6, 2026):
+The phrase as a named practice comes from **Boris Cherny (creator of Claude Code)**, on stage at Acquired Unplugged (presented by WorkOS) in San Francisco, June 2, 2026 ([video](https://www.youtube.com/watch?v=RkQQ7WEor7w)):
 
 > "I don't prompt Claude anymore. I have loops that are running. They're the ones that are prompting Claude and figuring out what to do. **My job is to write loops.**"
 
@@ -76,7 +76,7 @@ Cherny's implied three-stage progression of the practitioner ([OfficeChai covera
 
 | Date | Source | Contribution |
 |---|---|---|
-| ~Jun 5–6, 2026 | **Boris Cherny on stage, Anthropic dev conf SF** ([clip](https://x.com/Av1dlive/status/2063592868581978517), [coverage](https://officechai.com/ai/i-now-just-write-loops-to-prompt-claude-code-claude-code-creator-boris-cherny/)) | "My job is to write loops" — origin of the term |
+| Jun 2, 2026 | **Boris Cherny on stage, Acquired Unplugged (WorkOS), SF** ([video](https://www.youtube.com/watch?v=RkQQ7WEor7w), [clip](https://x.com/Av1dlive/status/2063592868581978517), [coverage](https://officechai.com/ai/i-now-just-write-loops-to-prompt-claude-code-claude-code-creator-boris-cherny/)) | "My job is to write loops" — origin of the term |
 | Jun 7–8, 2026 | [Peter Steinberger tweet](https://x.com/steipete/status/2063697162748260627) | "You should be designing loops that prompt your agents" — the viral vector (2M+ views) |
 | ~Jun 9, 2026 | [Addy Osmani, "Loop Engineering"](https://addyosmani.com/blog/loop-engineering/) | Names and systematizes the practice; warns of **"comprehension debt"**: "the faster the loop ships code you did not write, the larger the distance between what the repository contains and what you understand." |
 | Jun 2026 | Derivative wave | [Firecrawl](https://www.firecrawl.dev/blog/loop-engineering), [Pulumi](https://www.pulumi.com/blog/stop-prompting-design-the-loop/), [MindStudio](https://www.mindstudio.ai/blog/what-is-loop-engineering-ai-coding-agents), [Harness.io](https://www.harness.io/blog/agent-loop-new-os) ("the intelligence is in the loop, not in the tools"), Medium posts titled literally ["Stop Prompting Your Agent. Start Writing Loops."](https://medium.com/@garbarok/stop-prompting-your-agent-start-writing-loops-73608223f075) and ["I Don't Prompt Claude Anymore. I Write Loops That Prompt Claude."](https://medium.com/@fahey_james/i-dont-prompt-claude-anymore-i-write-loops-that-prompt-claude-57e48a4f28d7), [Data Science Dojo ReAct→loop-engineering guide](https://datasciencedojo.com/blog/agentic-loops-explained-from-react-to-loop-engineering-2026-guide/), [cobusgreyling/loop-engineering](https://github.com/cobusgreyling/loop-engineering) |
@@ -226,4 +226,53 @@ Anthropic's own meta-lesson ([Harness design for long-running apps](https://www.
 
 **What to be skeptical of:** (1) survivor bias — the viral demos (cursed, the C compiler) had enormous test-suite backpressure; loops without verifiable goals wander ("overcooking"/"undercooking"); (2) cost — Ralph burns ~$10/hr; Carlini's compiler cost $20K; (3) comprehension debt (Osmani) — the repo outruns your understanding of it; (4) staleness — Anthropic deleted its own fresh-context machinery within four months as models improved; the loop you write is scaffolding for the current model generation, not architecture; (5) structured multi-step work still fails in naive loops (Nauck's cascade-failure critique) — hence the trend toward plan files, task isolation, and evaluator gates.
 
-**Confidence notes:** all code/prompt excerpts marked verbatim were fetched from GitHub sources. The Cherny quote text is corroborated by multiple independent sources; the exact venue (Anthropic SF dev conference, ~June 5–6, 2026) is medium-confidence (one source conflated it with a podcast). The Hashimoto "harness engineering" coinage attribution is via secondary sources. View counts are approximate and inconsistent across sources.
+**Confidence notes:** all code/prompt excerpts marked verbatim were fetched from GitHub sources. The Cherny quote text is corroborated by multiple independent sources; follow-up research (§9) settled the venue as **Acquired Unplugged, presented by WorkOS, SF, June 2, 2026**. The Hashimoto "harness engineering" coinage attribution is via secondary sources. View counts are approximate and inconsistent across sources.
+
+---
+
+## 9. Addendum: the actual loops Cherny and Steinberger run (the standing kind)
+
+*Follow-up investigation. The Ralph/`/goal` loop (§4–5) iterates on ONE task until done. The loops Cherny and Steinberger were referring to are different: **standing loops** — scheduled or event-triggered processes that ORIGINATE work each tick (read inputs, decide what to do, prompt the agent, ship a PR), running indefinitely. "A loop is cron plus a decision-maker."*
+
+### 9.1 Boris Cherny's loops (verified, his own posts)
+
+His actual running loop list, from his ["15 underrated Claude Code features" thread](https://x.com/bcherny/status/2038454341884154269) (Mar 30, 2026, archived in [GitHub mirrors](https://github.com/shanraisshan/claude-code-best-practice/blob/main/tips/claude-boris-15-tips-30-mar-26.md)):
+
+```
+/loop 5m  /babysit            # auto-address code review, auto-rebase, shepherd PRs to production
+/loop 30m /slack-feedback     # automatically put up PRs for Slack feedback every 30 mins
+/loop     /post-merge-sweeper # put up PRs to address code review comments I missed
+/loop 1h  /pr-pruner          # close out stale and no-longer-necessary PRs
+# "...and lots more!"
+```
+
+His stated pattern: **"Experiment with turning workflows into skills + loops."** Each loop = a custom skill (the standing prompt/intent) + `/loop <interval>` (the trigger). The skill bodies were never published; public versions are community reconstructions. Launch post for `/loop` (~Mar 7, 2026): *"/loop is a powerful new way to schedule recurring tasks, for up to 3 days at a time. eg. '/loop babysit all my PRs. Auto-fix build issues and when comments come in, use a worktree agent to fix them'."*
+
+**What `/loop` actually is** ([official docs](https://code.claude.com/docs/en/scheduled-tasks)): a bundled skill (Claude Code ≥2.1.72) on a real in-session cron scheduler — internal `CronCreate`/`CronList`/`CronDelete` tools, ≤50 tasks/session, fires only when the session is idle, jitter ≤30 min, 7-day expiry. With no interval it **self-paces** (picks a 1min–1h delay each tick based on what it observed). With no prompt it runs a built-in maintenance prompt (tend the current PR: review comments, failed CI, conflicts), replaceable via `.claude/loop.md`. The escalation ladder: `/loop` (in-session) → [Desktop scheduled tasks](https://code.claude.com/docs/en/desktop-scheduled-tasks.md) (fresh session per run, prompt stored as `~/.claude/scheduled-tasks/<name>/SKILL.md`, can self-reschedule) → [Routines](https://code.claude.com/docs/en/routines.md) (Anthropic-managed cloud; triggers = cron ≥1h, per-routine API webhook, or GitHub events with filters; pushes only to `claude/`-prefixed branches). The "couple hundred agents" come from **dynamic workflows** (v2.1.154: Claude orchestrates tens–hundreds of agents in the background) plus `/batch` fan-out over git worktrees.
+
+Scale claims (verified via [Simon Willison](https://simonwillison.net/2025/Dec/27/boris-cherny/) and [Fortune, Jun 8, 2026](https://fortune.com/2026/06/08/anthropics-boris-cherny-creator-of-claude-code-says-there-are-days-he-manages-tens-of-thousands-of-ai-agents-at-once/)): 259 PRs / 497 commits / 40k lines added in 30 days, every line Claude-written; "a few hundred [agents]... some days... tens of thousands"; no handwritten code in ~8 months. Secondhand retellings add a CI-flaky-test-patcher loop and a Twitter-feedback-clustering loop every 30 min.
+
+### 9.2 Peter Steinberger's loops (verified, code on GitHub)
+
+His June 2026 post was a "monthly reminder" of a doctrine he ships as code:
+
+- **[autoreview skill](https://github.com/openclaw/agent-skills/blob/main/skills/autoreview/SKILL.md)** (in [steipete/agent-scripts](https://github.com/steipete/agent-scripts)): *"runs codex /review in a loop until there's no booboos anymore."* Findings are advisory — the agent verifies each independently, re-runs tests + review after accepting fixes; the loop ends when no accepted findings remain. The stop condition, not the review call, is the engineered part.
+- **maintainer-orchestrator skill** (same repo): a control-plane loop over his repos — classifies queue items (autonomous / owner-decision / ignore), delegates to workers, monitors them every 5 minutes; worker contract requires regression tests + "execute autoreview until findings are resolved" + a live-proof gate; release only at zero open issues + green CI.
+- **[ClawSweeper](https://github.com/openclaw/clawsweeper)**: the production fleet loop over OpenClaw's 7,000+ issue backlog. Four lanes — Review (proposes closes, never applies), Apply (wakes every 15 min, executes only unchanged high-confidence proposals), Repair (`@clawsweeper autofix` → bounded AI fix loop where "deterministic executor steps own every GitHub mutation"), Commit Review. Safety: **"AI runs without GitHub write tokens"**; adaptive cadence (hot items hourly, <30 days daily, older weekly).
+- **OpenClaw's loop primitives** ([automation docs](https://docs.openclaw.ai/automation)): Cron (SQLite-persisted, isolated `cron:<jobId>` sessions, retry backoff), **Heartbeat** (a main-session agent turn every 30 min reading a `HEARTBEAT.md` checklist; replying `HEARTBEAT_OK` is suppressed — the engineered silence condition), Background tasks, Task Flow, **Standing Orders** ("define programs with clear scope, triggers, and escalation rules — and the agent executes autonomously within those boundaries"), Hooks. Decision rule: cron for precise timing/isolated work, heartbeat when work benefits from session context.
+
+His arc: manual 3×3 terminal grid (["Just Talk To It"](https://steipete.me/posts/just-talk-to-it), Oct 2025) → parallel unattended runs (Dec 2025) → "give it cron jobs and a heartbeat so it can be proactive" ([Clawdbot](https://steipete.me/posts/2026/clawdbot), Jan 2026) → the viral post (Jun 2026).
+
+### 9.3 The anatomy both setups share
+
+Every standing loop in both setups has five parts: **(1) a trigger** (cron tick, heartbeat, webhook, GitHub event); **(2) a standing prompt file as intent** (skill body, `HEARTBEAT.md`, `loop.md`, `VISION.md`) so ticks don't re-derive goals; **(3) the model as the per-tick decision-maker** — it decides *whether* and *what*, not a hardcoded branch; **(4) a verifier that can say no** (tests, CI, review findings, live-proof gates) — per the most-cited reply to Steinberger's post: "a loop with nothing to push back is the agent agreeing with itself on repeat"; **(5) an explicit stop/silence condition** (`HEARTBEAT_OK`, "no findings remain", auto-archive-if-nothing-to-report) plus narrowly-privileged deterministic executors for side effects.
+
+### 9.4 Published standing loops you can read/run today
+
+- **[opensanctions/opensanctions issues-agent.yml](https://github.com/opensanctions/opensanctions/blob/main/.github/workflows/issues-agent.yml)** — the strongest production example: twice-daily cron → `tasks.py` scans the ETL warning index and emits a task matrix → claude-code-action per dataset (Sonnet for YAML fixes, Opus for code, per-task max_turns, max-parallel 4), deduped against open autofix PRs; prompt says "Skip ambiguous warnings — defer to human review."
+- **[Arize-ai/phoenix weekly deps upgrade](https://github.com/Arize-ai/phoenix/blob/main/.github/workflows/claude-weekly-deps-upgrade.yml)** — deterministic upgrade + 15 verification checks; Claude invoked *only on failure*; the agent is denied git/gh (the workflow commits) and protected paths are restored before commit so it can't edit its own automation.
+- **[anthropics/claude-code-action examples](https://github.com/anthropics/claude-code-action/tree/main/examples)** — `issue-triage.yml` (fires on issue open), `ci-failure-auto-fix.yml` (fires on CI failure, with a branch-prefix guard against self-triggering), plus the docs' daily-report cron.
+- **[cassioerodrigues/auto-skedway](https://github.com/cassioerodrigues/auto-skedway)** — the clearest "Boris-style" reimplementation: a ~250-line `auto-resolve-issues.sh` on cron — pick 3 oldest open issues → branch → `timeout 30m claude -p --dangerously-skip-permissions` → JSON sentinel check → verify a commit exists → `gh pr create` → comment on the issue; no auto-merge.
+- **[cobusgreyling/loop-engineering](https://github.com/cobusgreyling/loop-engineering)** — seven reusable patterns (Daily Triage, PR Babysitter, CI Sweeper, Dependency Sweeper, Changelog Drafter, Post-Merge Cleanup, Issue Triage); [bearded-giant/claude-code-config](https://github.com/bearded-giant/claude-code-config) has a real `/post-merge-sweeper` skill body.
+- **Fleets**: [Steve Yegge's Gas Town](https://github.com/steveyegge/gastown) ("Kubernetes for AI coding agents" — Deacon patrol cycles, Witness stuck-detection, Refinery merge queue, Beads ticket queue; ~$100/hr at 12–30 agents) and [paperclipai/paperclip](https://github.com/paperclipai/paperclip) (Matt Van Horn: ticket queue + heartbeats — "Agents wake on a schedule, check work, and act"; "If it can receive a heartbeat, it's hired").
+- The HN-canonical backlog pattern in one line: *"while true: if tickets exist → burn down the backlog by one ticket, exit; if not → figure out what feature would make sense to add next, create PRD and ERD, break down into tickets, exit."*
