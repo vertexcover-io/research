@@ -188,3 +188,83 @@ Critiques/reports:
   ~$10/hr API burn.
 - Alibaba Cloud: "From ReAct to Ralph Loop: A Continuous Iteration Paradigm".
 - Amp added amp.experimental.autoHandoff (handoff at 90% context).
+
+### Agent 4 — Prompt structures & harness designs (done; prompts fetched verbatim)
+
+Anthropic primary sources:
+- "Effective harnesses for long-running agents" (Nov 2025): initializer agent +
+  coding agent; init.sh, claude-progress.txt, 200-item feature_list.json (all
+  passes:false), git commits; smoke test at session start.
+- anthropics/claude-quickstarts/autonomous-coding — actual prompts verbatim:
+  coding_prompt.md opens "This is a FRESH context window - you have no memory of
+  previous sessions"; 10-step checklist (GET YOUR BEARINGS → init.sh → regression
+  check → CHOOSE ONE FEATURE → implement → browser-verify ("curl is insufficient")
+  → only modify 'passes' field → commit → update progress → end cleanly).
+  initializer: "IT IS CATASTROPHIC TO REMOVE OR EDIT FEATURES IN FUTURE SESSIONS."
+- "Harness design for long-running apps" (Mar 2026): planning/generation/evaluation
+  split into agents; with Opus 4.5 context resets were DROPPED in favor of one
+  continuous session + Agent SDK auto-compaction. "Every component in a harness
+  encodes an assumption about what the model can't do on its own... can go stale."
+- anthropics/cwc-long-running-agents (Code with Claude 2026): three primitives —
+  default-FAIL contract (PreToolUse hook denies writes to test-results.json
+  without evidence read first; "the harness makes 'done' structural"),
+  fresh-context evaluator subagent (PASS/NEEDS_WORK; "the builder shouldn't grade
+  its own work"), agent-maintained handoff (PROGRESS.md Done/In progress/Next/
+  Notes). Verbatim outer loop:
+    while grep -q '"passes": false' test-results.json; do
+      claude -p "Read PROGRESS.md and build the next unfinished feature..."
+      VERDICT=$(claude --agent evaluator -p "Review the most recent commit...")
+      [ "$(head -1 <<<"$VERDICT")" = "PASS" ] || echo "$VERDICT" > NEXT_FINDINGS.md
+    done
+  Plus kill-switch.sh (AGENT_STOP file), steer.sh (STEER.md), built-in /goal.
+- Nicholas Carlini C compiler (Feb 2026): 16 parallel agents, ~2000 fresh sessions,
+  $20K, 100K-line Rust C compiler builds Linux 6.9; lock files in current_tasks/
+  synced via git; massive test-suite backpressure.
+- Agent SDK loop: gather context → take action → verify work → repeat.
+- Context engineering post: compaction vs structured note-taking vs sub-agents;
+  Pokémon memory failure (31 files, transcript-not-state, stuck in second town).
+OpenAI:
+- "Unrolling the Codex agent loop"; long-horizon guidance = durable project memory
+  in markdown; /responses/compact endpoint; /goal productized outer loop.
+  Continuation philosophy: compaction (one long session) vs Ralph's stateless restart.
+Others:
+- obra/superpowers: subagent-per-task + two-stage review; "Continuous execution:
+  Do not pause to check in... only reasons to stop are BLOCKED, ambiguity, or all
+  tasks complete."
+- 12-factor/Horthy "dumb zone": past ~40% context utilization quality degrades —
+  empirical basis for fresh-context iterations.
+- frankbria/ralph-claude-code: dual-condition exit (completion indicators AND
+  EXIT_SIGNAL:true in RALPH_STATUS block) + circuit breakers.
+- HN: Opus 4.5 ran 4h49m via stop hooks; Matt Van Horn loops PRs across ~30 repos
+  overnight; Cherny: "always give Claude a way to verify its work... you can't
+  manually review a 26-hour thread—the system must verify itself."
+
+Synthesis (consensus patterns) captured for README:
+- Prompt structure: fresh-context identity → mandatory orientation ritual →
+  regression check → ONE task scope clamp → search-before-assume → verification
+  with anti-shortcut rules → end-of-iteration ritual → guardrails.
+- Persistent state: plan/task file (append-only goals + pass flags), curated
+  progress/handoff file, lean operational AGENTS.md, git, evidence artifacts.
+- Stop conditions menu: work-queue-empty (data not vibes), completion promise,
+  independent evaluator, hard budgets, stall detection, human escape hatches.
+
+## Verification pass
+
+Cross-checked across independent agents:
+- Cherny quote: agents 1 & 5 both found it; venue = Anthropic dev conf SF
+  (~Jun 5-6, 2026) per Firecrawl/productmarketfit/OfficeChai; one source said
+  "Acquired podcast" — treated as misattribution (likely conflation with his
+  Dec 2025 Peterman Pod interview). Confidence: quote text high, venue medium.
+- Steinberger tweet: 2 agents, consistent text & status ID. High confidence.
+- Osmani "Loop Engineering" ~Jun 9 2026: 3 agents converge. High confidence.
+- Ralph loop one-liner & playbook details: repo cloned, verbatim. High confidence.
+- sketch.dev 9-line loop, Anthropic quickstart prompts, cwc loop, 12-factor
+  pseudocode: fetched from raw.githubusercontent / mirrors. High confidence.
+- Mitchell Hashimoto "harness engineering" coinage (Feb 2026): secondary sources
+  only. Medium confidence — flagged in README.
+- View counts (700K/2.2M/6.5M): inconsistent across sources; report as approximate.
+
+## Wrap-up
+
+Wrote README.md synthesizing all five angles with citations. Final commit includes
+only notes.md + README.md (no fetched code copies, per repo instructions).
