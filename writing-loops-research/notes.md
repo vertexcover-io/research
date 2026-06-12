@@ -326,3 +326,42 @@ Fleets/daemons:
 Cross-cutting patterns: deterministic work-origination + agent-as-fixer; dedupe/
 idempotency guards; hard limits (turns/parallel/budget/tool allowlists/branch
 prefixes); verification before merge; report-don't-act defaults.
+
+### Agent S — Steinberger's actual loops (done; code fetched verbatim from GitHub)
+
+The viral post (Jun 7-8, 2026, ~6.5M views): "monthly reminder" framing — doctrine
+he'd demonstrated since May 2026. His thread reply to "how?": point at VISION.md
+("so each loop tick does not re-derive intent from scratch"). Circulating example:
+"/loop babysit all my PRs. Auto-fix build issues, and when comments come in, use a
+worktree agent to fix them." Top reply (@mosyaseen): "the other half is putting
+something in the loop that can say no: a test, a type check, a real error. a loop
+with nothing to push back is the agent agreeing with itself on repeat."
+Distillation: "a loop is cron plus a decision-maker."
+
+His actual loops:
+- autoreview skill (openclaw/agent-skills skills/autoreview/SKILL.md; symlinked in
+  steipete/agent-scripts, 4.8k stars): "runs codex /review in a loop until there's
+  no booboos anymore" (tweet 2054850632067019173, May 14 2026). Findings advisory;
+  verify independently; loop ends when no accepted findings remain.
+- maintainer-orchestrator skill: control-plane agent classifying queue items
+  (autonomous/owner-decision/ignore), delegates to workers, monitors every 5 min,
+  worker contract: regression tests + "execute autoreview until findings are
+  resolved" + live-proof gate; release only at zero open issues + green CI.
+- ClawSweeper (openclaw/clawsweeper): weekly sweep of all 7k+ issues/PRs; four
+  lanes Review (proposes, never applies) / Apply (15-min wake, high-confidence
+  unchanged proposals only) / Repair (@clawsweeper autofix → bounded AI fix loop;
+  deterministic executor owns every GitHub mutation) / Commit Review. "AI runs
+  without GitHub write tokens." Adaptive cadence hot=hourly, <30d=daily, else weekly.
+- OpenClaw architecture: 6 mechanisms — Cron, Heartbeat, Background tasks, Task
+  Flow, Standing Orders, Hooks. Heartbeat = main-session turn every 30m reading
+  HEARTBEAT.md; reply HEARTBEAT_OK suppressed. Cron: SQLite-persisted, at/every/
+  cron schedules, isolated cron:<jobId> sessions, announce/webhook delivery,
+  maxConcurrentRuns 8 + retry backoff. Standing Orders doc = the tweet encoded:
+  "define programs with clear scope, triggers, and escalation rules."
+- Arc: "Just Talk To It" (Oct 2025, manual 3x3 grid) → "Shipping at Inference-
+  Speed" (Dec 2025, parallel unattended) → "Clawdbot" (Jan 2, 2026: "give it cron
+  jobs and a heartbeat so it can be proactive") → OpenAI (Feb 2026) → autoreview/
+  crabbox (May) → viral post (Jun). Lex Fridman #491 (Feb 12, 2026).
+- Synthesis: every loop = trigger + standing prompt file (intent) + model as
+  per-tick decision-maker + verifier that can say no + explicit stop/silence
+  condition, with deterministic narrowly-privileged executors for side effects.
