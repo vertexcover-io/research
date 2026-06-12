@@ -268,3 +268,61 @@ Cross-checked across independent agents:
 
 Wrote README.md synthesizing all five angles with citations. Final commit includes
 only notes.md + README.md (no fetched code copies, per repo instructions).
+
+## Follow-up (same day): "the loop Boris/Steinberger meant" — standing/trigger-driven loops
+
+User clarified: not the Ralph/goal-style iterate-until-done loop, but standing
+loops that ORIGINATE work (cron/event → decide → prompt agent). Launched 3 agents:
+Cherny's actual loops, Steinberger/OpenClaw loops, trigger-driven examples in wild.
+
+### Agent C — Trigger-driven loop implementations (done)
+
+Official/vendor:
+- Claude Code **Routines** (code.claude.com/docs/en/web-scheduled-tasks): saved
+  prompt + repos + connectors; triggers = cron (min 1h), per-routine HTTP API
+  endpoint (POST /v1/claude_code/routines/<id>/fire), GitHub events with filters.
+  Safety: claude/-prefixed branches only, daily run caps. Also /loop (in-session
+  recurring, docs/en/scheduled-tasks) and Desktop local scheduled tasks.
+- anthropics/claude-code-action examples: issue-triage.yml (on issues:opened),
+  ci-failure-auto-fix.yml (on workflow_run completed + failure, with branch-prefix
+  guard against self-trigger), daily-report cron example in docs.
+- Headless docs: claude -p --bare + --allowedTools + --max-turns = the cron surface.
+- OpenAI Codex Automations: cron syntax, results to inbox, auto-archives if
+  nothing to report. Devin Scheduled Sessions + Playbooks (cron, Slack/GitHub/
+  Linear/webhook triggers, invocation limits).
+Production OSS standing loops:
+- **opensanctions/opensanctions issues-agent.yml** — strongest real example:
+  2x-daily cron → tasks.py scans ETL warning index → JSON task matrix → claude-
+  code-action per dataset (Sonnet for YAML fixes, Opus for code), max-parallel 4,
+  dedupe vs open autofix PRs and closed identical branches, "skip ambiguous
+  warnings — defer to human review".
+- JetBrains/ideavim updateChangelogClaude.yml (daily 5am cron, Claude opens PR).
+- Arize-ai/phoenix claude-weekly-deps-upgrade.yml: deterministic upgrade + 15
+  verify checks logged to .scratch/verify/, Claude invoked ONLY on failure; agent
+  denied git/gh; protected paths restored before commit.
+- speed47/spectre-meltdown-checker vuln-watch.yml: daily; Claude step skipped if
+  nothing new; report-only output.
+- sandgraal/compass agent-nightly-triage.yml: memory file + single rolling issue
+  ("🌙 Nightly bug triage") instead of issue spam; repo-variable kill switch.
+- wpbluiss/conduit-nextjs auto-review-merge.yml: PR events + 30-min cron safety
+  net; safety floor (never auto-merge destructive/secret-exposing); gh pr merge.
+Fleets/daemons:
+- **Steve Yegge Gas Town** (steveyegge/gastown): "Kubernetes for AI coding agents",
+  20-30 Claude instances; Deacon patrol cycles, Witness stuck-detection, Refinery
+  merge queue; work from Beads issue tracker; ~$100/hr.
+- **paperclipai/paperclip** (Matt Van Horn): ticket queue + heartbeats, "Agents
+  wake on a schedule, check work, and act"; "If it can receive a heartbeat, it's
+  hired"; ACP plugin binds coding agents to chat threads.
+- **OpenClaw**: cron jobs (~/.openclaw/cron/, isolated session per job) +
+  heartbeat (default 30 min, HEARTBEAT.md checklist); cron-vs-heartbeat doc;
+  template repo converts prompt jobs to deterministic scripts over time.
+- Small cron+claude -p: jshchnz/claude-code-scheduler (launchd/crontab plugin),
+  mvanhorn/agentmail-to-claude-code (email → session), hum-growth/hum,
+  bakernyc/autonomous-trading-agent (limits in CLAUDE.md), brad-pierce/dreamcatcher,
+  AnandChowdhary/continuous-claude (PR-native bridge case).
+- HN canonical pattern (item 46632445): "while true: if tickets exist -> burn down
+  backlog by one ticket, exit; if not -> figure out what feature would make sense,
+  create PRD/ERD, break into tickets, exit."
+Cross-cutting patterns: deterministic work-origination + agent-as-fixer; dedupe/
+idempotency guards; hard limits (turns/parallel/budget/tool allowlists/branch
+prefixes); verification before merge; report-don't-act defaults.
