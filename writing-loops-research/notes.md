@@ -129,3 +129,62 @@ Ralph family / loop-named repos:
   curl), wulawulu/learn-claude-code-rs (Rust), bentossell/agent-loop (shell),
   sergenes/mini_agent (Python).
 - The Register covered Ralph (Jan 2026): theregister.com/2026/01/27/ralph_wiggum_claude_loops/
+
+### Agent 2 — Ralph Wiggum deep-dive (done)
+
+Primary sources (Huntley):
+- ghuntley.com/ralph/ (Jul 2025): "Ralph is a technique. In its purest form, Ralph
+  is a Bash loop." `while :; do cat PROMPT.md | npx --yes @sourcegraph/amp ; done`
+  "deterministically bad in a nondeterministic world"; "tune it like a guitar";
+  $50k contract delivered for $297 in API costs; "Engineers are still needed."
+- ghuntley.com/loop/ (~Jan 2026): "everything is a ralph loop"; anti-multi-agent
+  ("microservices... non-deterministic — a red hot mess"); "sit on the loop";
+  "watch the loop as that is where your personal development... will come from."
+- ghuntley.com/cursed/ (~Sep 2025): 3-month loop produced "cursed", a Gen-Z slang
+  programming language (slay=fn, sus=var) with LLVM backend. PC Gamer covered it.
+- ghuntley.com/pressure/ (backpressure: tests/typecheckers reject bad generations);
+  ghuntley.com/allocations/ (context allocation theory; MCP wastes context).
+- ghuntley/how-to-ralph-wiggum repo (Dec 2025, with Clayton Farr's ralph-playbook):
+  "3 Phases, 2 Prompts, 1 Loop" — specs/*.md → PLANNING loop (gap analysis →
+  IMPLEMENTATION_PLAN.md) → BUILDING loop (one task/iteration, commit, exit).
+  loop.sh: `cat $PROMPT_FILE | claude -p --dangerously-skip-permissions
+  --output-format=stream-json --model opus --verbose` in while true; max-iterations;
+  git push per iteration. PROMPT_build.md: "Study specs/* with up to 500 parallel
+  Sonnet subagents", "only 1 subagent for build/tests" (backpressure), escalating-9s
+  guardrails. Context: ~176K usable, 40-60% utilization "smart zone".
+
+Official adoption & controversy:
+- Anthropic official plugin: anthropics/claude-code plugins/ralph-wiggum —
+  /ralph-loop "task" --completion-promise "DONE" --max-iterations 50; implemented
+  via Stop hook re-feeding prompt IN ONE SESSION (context accumulates!) — issue
+  #125 "deviates from original Ralph behavior (context should be fresh each
+  iteration)"; Huntley + Dex Horthy video "why Claude Code's implementation isn't
+  it" (youtube O2bBWDoxO4s). Curio: claude-code#23084 model-welfare complaint.
+
+History/amplification:
+- humanlayer.dev/blog/brief-history-of-ralph (Dex Horthy): "naive persistence";
+  "the LLM isn't protected from its own mess; it is forced to confront it."
+- Viral wave Dec 2025–Jan 2026: Matt Pocock (aihero.dev guides), Ryan Carson
+  (690k+ views); Huntley pushed back on both simplifications.
+- VentureBeat "How Ralph Wiggum went from The Simpsons to the biggest name in AI".
+
+Implementations:
+- snarktank/ralph (Ryan Carson): PRD-driven, prd.json + progress.txt + git as
+  memory, "Each iteration is a fresh instance with clean context", MAX_ITERATIONS=10.
+- snwfdhmp/awesome-ralph list: mikeyobrien/ralph-orchestrator (Rust, 7 backends,
+  "Hat" personas), vercel-labs/ralph-loop-agent, iannuttall/ralph,
+  frankbria/ralph-claude-code (circuit breaker), agrimsingh/ralph-wiggum-cursor
+  (context rotation @80k tokens), Block Goose ralph-loop tutorial, r/RalphCoding.
+
+Critiques/reports:
+- HN id=44565028 (original), id=45005434 (repomirror "6 repos overnight"),
+  id=46672413 "Ralph Wiggum Doesn't Work" (Pedro Nauck: cascade failures — "Jenga
+  tower of broken code by Task 10"; needs isolation/verification/persistence).
+- codecentric report: phase isolation + explicit verification phase; "the better
+  your spec, the better the output". Failure modes: "overcooking" vs "undercooking".
+- Steve Kinney "Entering the Mind of Ralph Wiggum" (Mar 2026): "your files and git
+  history are a better memory layer than the LLM's context window"; 4 components
+  (bash=dumbest part, PROMPT.md=brain, filesystem=memory, backpressure=verification);
+  ~$10/hr API burn.
+- Alibaba Cloud: "From ReAct to Ralph Loop: A Continuous Iteration Paradigm".
+- Amp added amp.experimental.autoHandoff (handoff at 90% context).
