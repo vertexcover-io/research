@@ -96,3 +96,36 @@ no Simon Willison comment on the June 2026 coinage yet.
 - Caveat: Hashimoto coinage attribution is via secondary sources.
 - Note: this agent said Cherny clip was "Acquired podcast" per one source — agent 1
   flagged that as likely conflation; dev-conf attribution better corroborated.
+
+### Agent 3 — GitHub repos & code (done; code verified via raw.githubusercontent)
+
+Canonical essays + code:
+- Thorsten Ball "How to Build an Agent" (Apr 2025): Go, ~315 lines, "There is no
+  moat." Community ports: leobeeson/single-file-ai-agent-tutorial (Python, 218-line
+  main.py), ivanleomk/building-an-agent (TS), kevinyank.com JS port.
+- sketch.dev 9-line loop (Philip Zeyliger, May 2025), verified verbatim:
+  `while True: output, tool_calls = llm(msg); if tool_calls: msg = [handle_tool_call(tc)...] else: msg = user_input()`
+  Single tool: bash. Crawshaw: "an agent is a for loop which contains an LLM call."
+Anthropic's own:
+- anthropics/claude-quickstarts agents/agent.py (~12-line _agent_loop), computer-use
+  demo sampling_loop(); claude-cookbooks patterns/agents (45k stars).
+- Agent SDK docs: "same tools, agent loop, and context management that power Claude
+  Code"; Client SDK = you write the while loop, Agent SDK = Claude handles it.
+Famous minimal harnesses:
+- SWE-agent/mini-swe-agent (5.1k stars): "100 line AI agent", >74% SWE-bench
+  verified, bash-only tool, run() = `while True: self.step()`.
+- huggingface/smolagents (27.8k stars): ReAct loop in _run_stream, max_steps bound.
+- HF Tiny Agents (Julien Chaumond): "an Agent is literally just a while loop on top
+  of an MCP client" — Agent.ts in huggingface.js, 50-70 lines.
+- simonw/llm 0.26 tools: chain() loop until no tool calls or chain_limit.
+- humanlayer/12-factor-agents (23.2k stars): Factor 8 own-your-control-flow
+  pseudocode loop.
+Ralph family / loop-named repos:
+- iannuttall/ralph (928 stars, TS): file-based agent loop, .ralph/ + PRD JSON, one
+  story per fresh-context iteration, commits each pass, backend-agnostic AGENT_CMD.
+- vercel-labs/ralph-loop-agent (795 stars, "Continuous Autonomy for the AI SDK"),
+  coleam00/ralph-loop-quickstart (157), disler/infinite-agentic-loop (590).
+- Micro-harnesses: genlayerlabs/subzeroclaw (C, ~380 lines), wedow/harness (bash+jq+
+  curl), wulawulu/learn-claude-code-rs (Rust), bentossell/agent-loop (shell),
+  sergenes/mini_agent (Python).
+- The Register covered Ralph (Jan 2026): theregister.com/2026/01/27/ralph_wiggum_claude_loops/
